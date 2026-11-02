@@ -16,7 +16,3 @@ Rodar localmente: `python -m http.server` na raiz e abrir http://localhost:8000.
 Deploy: importar o repositório na Vercel (Framework preset: Other, sem build).
 
 A carroceria (material `WCCARBODY`) sai preta, sem a skin padrão do mod; o site aplica a skin enviada.
-
-Observações por carro:
-- BMW M4 GT3: rodas centralizadas automaticamente (dianteiras 0,136 m e traseiras 0,083 m para trás).
-- Nissan GT-R Nismo GT3: aro, pneu e disco usam texturas que não estão no .mas do carro; ficam em cinza/preto.
