@@ -1,0 +1,4 @@
+tools/__pycache__/
+tools/teste_*.png
+public/
+tools/teste_local.html

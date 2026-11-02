@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sparking GT3 · Livery Viewer</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  } }
+  </script>
+</head>
+<body>
+  <div id="viewer"></div>
+
+  <header class="painel">
+    <h1>Sparking GT3 <span>Livery Viewer</span></h1>
+    <label>Carro
+      <select id="carro"></select>
+    </label>
+    <label class="arquivo">
+      <input id="skin" type="file" accept="image/png">
+      <span>Importar skin (PNG)</span>
+    </label>
+    <p id="status" role="status"></p>
+  </header>
+
+  <div id="carregando" hidden>Carregando modelo…</div>
+  <p class="dica">Arraste para girar · roda do mouse para zoom · botão direito para mover</p>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

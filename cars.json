@@ -1,0 +1,15 @@
+[
+  { "id": "acura-nsx-gt3-evo", "name": "Acura NSX GT3 Evo", "model": "models/acura-nsx-gt3-evo.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "aston-martin-vantage-amr-gt3", "name": "Aston Martin Vantage AMR GT3", "model": "models/aston-martin-vantage-amr-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "audi-r8-lms-evo-gt3", "name": "Audi R8 LMS Evo GT3", "model": "models/audi-r8-lms-evo-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "bmw-m4-gt3", "name": "BMW M4 GT3", "model": "models/bmw-m4-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "corvette-z06-gt3", "name": "Corvette Z06 GT3", "model": "models/corvette-z06-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "ferrari-296-gt3", "name": "Ferrari 296 GT3", "model": "models/ferrari-296-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "ford-mustang-gt3", "name": "Ford Mustang GT3", "model": "models/ford-mustang-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "lamborghini-huracan-evo2-gt3", "name": "Lamborghini Huracán Evo2 GT3", "model": "models/lamborghini-huracan-evo2-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "lexus-rc-f-gt3", "name": "Lexus RC F GT3", "model": "models/lexus-rc-f-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "mclaren-720s-gt3", "name": "McLaren 720S GT3", "model": "models/mclaren-720s-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "mercedes-amg-gt3", "name": "Mercedes-AMG GT3", "model": "models/mercedes-amg-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "nissan-gt-r-nismo-gt3", "name": "Nissan GT-R Nismo GT3", "model": "models/nissan-gt-r-nismo-gt3.glb", "skinMaterial": "WCCARBODY" },
+  { "id": "porsche-992-gt3", "name": "Porsche 992 GT3", "model": "models/porsche-992-gt3.glb", "skinMaterial": "WCCARBODY" }
+]
