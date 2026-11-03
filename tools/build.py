@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 from gmt import parse
 from banner import make as make_banner
+from windshield import make_strip
 
 SKIP_TEX = ('CUBEMAP', 'EMAP_')
 SKIN_MAT = 'WCCARBODY'
@@ -47,6 +48,7 @@ def build(ext, files, out, front_dz=0.0, rear_dz=0.0, banner=None, log=print):
         images.append({'bufferView':addview(buf.getvalue()),'mimeType':'image/png','name':name})
         texs.append({'source':len(images)-1,'sampler':0})
         imgidx[cache] = (len(texs)-1, im.size, im.getextrema()[3][0] < 128); return imgidx[cache]
+    glass = []
     for f in files:
         secs, ms = parse(ext+f); prims = []
         c = corner(f); dz = (front_dz if c in ('LF','RF') else rear_dz) if c else 0.0
@@ -72,6 +74,8 @@ def build(ext, files, out, front_dz=0.0, rear_dz=0.0, banner=None, log=print):
                 mats.append(mat); matidx[key] = len(mats)-1
             if not s['idx']: continue
             A = np.frombuffer(s['A'], '<f4').reshape(-1,8); B = np.frombuffer(s['B'], '<f4').reshape(-1,8)
+            if 'BODY' in f.upper() and re.search(r'WINDOW|GLASS', key.upper()) and (m['flags'] & 0x20):
+                glass.append(A[:,:3][np.array(s['idx']).reshape(-1,3)].astype(float))
             pos = A[:,0:3].copy(); nrm = A[:,3:6].copy(); uv = B[:,0:2].copy()
             uv[:,1] += np.where(uv[:,1] < 0, 1.0, 0.0)
             pos[:,2] += dz
@@ -83,6 +87,21 @@ def build(ext, files, out, front_dz=0.0, rear_dz=0.0, banner=None, log=print):
                           'indices':addacc(idx,'SCALAR',5123,34963),'material':matidx[key]})
         if prims:
             meshes.append({'name':os.path.splitext(f)[0],'primitives':prims}); nodes.append({'name':meshes[-1]['name'],'mesh':len(meshes)-1})
+    if banner and BANNER_MAT not in matidx and glass:
+        strip = make_strip(np.concatenate(glass))
+        if strip:
+            pos, uv, idx = strip
+            im = make_banner(Image.new('RGB', (512, 128)), banner).convert('RGBA')
+            buf = io.BytesIO(); im.save(buf, 'PNG', optimize=True)
+            images.append({'bufferView':addview(buf.getvalue()),'mimeType':'image/png','name':'banner_gerado.png'})
+            texs.append({'source':len(images)-1,'sampler':0})
+            mats.append({'name':'BANNER_GERADO','doubleSided':True,'pbrMetallicRoughness':{'metallicFactor':0.0,'roughnessFactor':0.9,'baseColorTexture':{'index':len(texs)-1}}})
+            pos = pos.copy(); pos[:,0] *= -1
+            nrm = np.tile(np.array([0,1,0],'<f4'), (len(pos),1))
+            prim = {'attributes':{'POSITION':addacc(pos,'VEC3',5126,34962,True),'NORMAL':addacc(nrm,'VEC3',5126,34962),'TEXCOORD_0':addacc(uv,'VEC2',5126,34962)},
+                    'indices':addacc(idx,'SCALAR',5123,34963),'material':len(mats)-1}
+            meshes.append({'name':'BANNER_GERADO','primitives':[prim]}); nodes.append({'name':'BANNER_GERADO','mesh':len(meshes)-1})
+            log('  faixa de para-brisa gerada sobre o vidro')
     gl = {'asset':{'version':'2.0','generator':'sparking-livery-viewer gmt2glb'},'scene':0,'scenes':[{'nodes':list(range(len(nodes)))}],
           'nodes':nodes,'meshes':meshes,'materials':mats,'accessors':accs,'bufferViews':bviews,'buffers':[{'byteLength':len(bin_)}],
           'images':images,'textures':texs,'samplers':[{'magFilter':9729,'minFilter':9987,'wrapS':10497,'wrapT':10497}]}

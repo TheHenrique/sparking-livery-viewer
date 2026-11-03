@@ -75,7 +75,7 @@ def main():
             if r and abs(np.mean(r)) > 0.03: rear = round(float(np.mean(r)), 3)
     print('ajuste aplicado: dianteiras', front, 'traseiras', rear)
     mats = build(ext, files, a.out, front, rear, banner=a.banner)
-    if a.banner and 'WCEXTRA1' not in mats: print('aviso: este carro nao tem faixa de para-brisa separada (WCEXTRA1)')
+    if a.banner and 'WCEXTRA1' not in mats and 'BANNER_GERADO' not in mats: print('aviso: nao foi possivel criar a faixa do para-brisa')
     print('materiais:', ' '.join(mats))
     print('OK', a.out, round(os.path.getsize(a.out)/1e6, 2), 'MB')
 
