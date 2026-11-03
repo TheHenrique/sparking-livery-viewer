@@ -4,9 +4,11 @@ import os, json, struct, io, re
 import numpy as np
 from PIL import Image
 from gmt import parse
+from banner import make as make_banner
 
 SKIP_TEX = ('CUBEMAP', 'EMAP_')
 SKIN_MAT = 'WCCARBODY'
+BANNER_MAT = 'WCEXTRA1'   # faixa do para-brisa
 CORNER = re.compile(r'_(LF|RF|LR|RR)(_|\.|$)')
 WHEELISH = re.compile(r'(TYRE|TIRE|WHEEL|RIM|DISC|CALIPER)')
 
@@ -22,7 +24,7 @@ def corner(name):
     m = CORNER.search(n)
     return m.group(1) if m else None
 
-def build(ext, files, out, front_dz=0.0, rear_dz=0.0, log=print):
+def build(ext, files, out, front_dz=0.0, rear_dz=0.0, banner=None, log=print):
     ext = os.path.join(ext, '')
     bin_ = bytearray(); bviews=[]; accs=[]; meshes=[]; nodes=[]; mats=[]; matidx={}; images=[]; texs=[]; imgidx={}
     def addview(b, target=None):
@@ -34,15 +36,17 @@ def build(ext, files, out, front_dz=0.0, rear_dz=0.0, log=print):
         a = {'bufferView':addview(arr.tobytes(),target),'componentType':comp,'count':int(arr.shape[0]),'type':typ}
         if mm: a['min'] = arr.min(0).tolist(); a['max'] = arr.max(0).tolist()
         accs.append(a); return len(accs)-1
-    def image(name):
-        if name in imgidx: return imgidx[name]
+    def image(name, transform=None):
+        cache = name if transform is None else name + '#banner'
+        if cache in imgidx: return imgidx[cache]
         p = ext+name
-        if not os.path.exists(p): imgidx[name] = None; log('  textura fora do .mas:', name); return None
+        if not os.path.exists(p): imgidx[cache] = None; log('  textura fora do .mas:', name); return None
         im = Image.open(p); im.load(); im = im.convert('RGBA')
+        if transform: im = transform(im).convert('RGBA')
         buf = io.BytesIO(); im.save(buf, 'PNG', optimize=True)
         images.append({'bufferView':addview(buf.getvalue()),'mimeType':'image/png','name':name})
         texs.append({'source':len(images)-1,'sampler':0})
-        imgidx[name] = (len(texs)-1, im.size, im.getextrema()[3][0] < 128); return imgidx[name]
+        imgidx[cache] = (len(texs)-1, im.size, im.getextrema()[3][0] < 128); return imgidx[cache]
     for f in files:
         secs, ms = parse(ext+f); prims = []
         c = corner(f); dz = (front_dz if c in ('LF','RF') else rear_dz) if c else 0.0
@@ -52,7 +56,12 @@ def build(ext, files, out, front_dz=0.0, rear_dz=0.0, log=print):
                 tex = diffuse(m); blend = bool(m['flags'] & 0x20)
                 mat = {'name':key,'pbrMetallicRoughness':{'metallicFactor':0.0,'roughnessFactor':0.5}}
                 if key == SKIN_MAT: tex = None      # skin padrao fora: o site aplica a skin enviada
-                info = image(tex) if tex else None
+                if key == BANNER_MAT and banner and tex:
+                    def _banner(im):   # mantem o alfa original (formato da faixa)
+                        new = make_banner(im.convert('RGB'), banner).convert('RGBA'); new.putalpha(im.getchannel('A')); return new
+                    info = image(tex, _banner)
+                else:
+                    info = image(tex) if tex else None
                 if key == SKIN_MAT: mat['pbrMetallicRoughness']['baseColorFactor'] = [0.02,0.02,0.02,1]
                 if info: mat['pbrMetallicRoughness']['baseColorTexture'] = {'index':info[0]}
                 elif re.search(r'TIRE|TYRE', key.upper()): mat['pbrMetallicRoughness']['baseColorFactor'] = [0.06,0.06,0.06,1]

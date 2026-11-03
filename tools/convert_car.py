@@ -1,6 +1,7 @@
 """Converte um carro do rFactor 1 (pasta com .mas + Graphics.gen) em .glb para o site.
-uso: python3 convert_car.py "<pasta do carro>" <saida.glb> [--front DZ] [--rear DZ] [--no-auto]
+uso: python3 convert_car.py "<pasta do carro>" <saida.glb> [--banner TEXTO] [--front DZ] [--rear DZ] [--no-auto]
 - escolhe as malhas do maior LOD lendo o *Graphics.gen (sem piloto, capacete, cockpit, sombra, colisao)
+- --banner: troca a faixa do para-brisa (WCEXTRA1) por fundo preto com o TEXTO em branco
 - mede o centro dos arcos na carroceria e centraliza as rodas (DZ em metros, + = para tras)"""
 import os, sys, re, glob, tempfile, argparse
 import numpy as np
@@ -55,6 +56,7 @@ def main():
     ap.add_argument('car'); ap.add_argument('out')
     ap.add_argument('--front', type=float); ap.add_argument('--rear', type=float)
     ap.add_argument('--no-auto', action='store_true')
+    ap.add_argument('--banner')
     a = ap.parse_args()
     gen = glob.glob(os.path.join(a.car, '*raphics.gen'))[0]
     masname = [m for m in re.findall(r'MASFILE\s*=\s*([^\s]+)', open(gen, errors='ignore').read(), re.I) if os.path.exists(os.path.join(a.car, m))][0]
@@ -72,7 +74,8 @@ def main():
             if f and abs(np.mean(f)) > 0.03: front = round(float(np.mean(f)), 3)
             if r and abs(np.mean(r)) > 0.03: rear = round(float(np.mean(r)), 3)
     print('ajuste aplicado: dianteiras', front, 'traseiras', rear)
-    mats = build(ext, files, a.out, front, rear)
+    mats = build(ext, files, a.out, front, rear, banner=a.banner)
+    if a.banner and 'WCEXTRA1' not in mats: print('aviso: este carro nao tem faixa de para-brisa separada (WCEXTRA1)')
     print('materiais:', ' '.join(mats))
     print('OK', a.out, round(os.path.getsize(a.out)/1e6, 2), 'MB')
 
