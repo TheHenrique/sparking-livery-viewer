@@ -90,8 +90,8 @@ def build(ext, files, out, front_dz=0.0, rear_dz=0.0, banner=None, log=print):
     if banner and BANNER_MAT not in matidx and glass:
         strip = make_strip(np.concatenate(glass))
         if strip:
-            pos, uv, idx = strip
-            im = make_banner(Image.new('RGB', (512, 128)), banner).convert('RGBA')
+            pos, uv, idx, aspect = strip
+            im = make_banner(Image.new('RGB', (1024, max(64, int(round(1024/aspect))))), banner).convert('RGBA')
             buf = io.BytesIO(); im.save(buf, 'PNG', optimize=True)
             images.append({'bufferView':addview(buf.getvalue()),'mimeType':'image/png','name':'banner_gerado.png'})
             texs.append({'source':len(images)-1,'sampler':0})
