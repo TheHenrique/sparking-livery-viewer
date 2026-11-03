@@ -9,18 +9,18 @@ const status = (msg, tipo = '') => { el('status').textContent = msg; el('status'
 // --- cena -------------------------------------------------------------
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMapping = THREE.NeutralToneMapping;   // preserva as cores da skin (ACES clareava e lavava)
 el('viewer').appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-scene.environmentIntensity = 0.8;
+scene.environmentIntensity = 0.6;
 
-const sol = new THREE.DirectionalLight(0xffffff, 1.6);
+const sol = new THREE.DirectionalLight(0xffffff, 2.4);
 sol.position.set(4, 8, 5);
-scene.add(sol, new THREE.HemisphereLight(0xffffff, 0x222222, 0.6));
+scene.add(sol, new THREE.HemisphereLight(0xffffff, 0x222222, 0.8));
 
 const camera = new THREE.PerspectiveCamera(35, 1, 0.05, 100);
 camera.position.set(5.5, 2.2, 6);
